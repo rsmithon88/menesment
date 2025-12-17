@@ -17,8 +17,10 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { MoreHorizontal, Plus, Search, Filter } from "lucide-react";
+import { MoreHorizontal, Plus, Search, Filter, Trash2, Edit } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { toast } from "@/hooks/use-toast";
 
 const students = [
   { id: "ST-001", name: "আব্দুর রহমান", class: "হেফজ বিভাগ", roll: "০১", status: "Active", fees: "Paid" },
@@ -29,13 +31,21 @@ const students = [
 ];
 
 export default function Students() {
+  const handleDelete = (id: string) => {
+    toast({
+      title: "ছাত্র মুছে ফেলা হয়েছে",
+      description: `আইডি: ${id} সফলভাবে ডিলিট করা হয়েছে।`,
+      variant: "destructive"
+    });
+  };
+
   return (
     <Layout>
       <div className="space-y-6">
         <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
           <div>
-            <h1 className="text-3xl font-bold tracking-tight">ছাত্র/ছাত্রী তালিকা</h1>
-            <p className="text-muted-foreground mt-2">সকল ছাত্র/ছাত্রীদের তথ্য ও অবস্থা।</p>
+            <h1 className="text-3xl font-bold tracking-tight">ছাত্র/ছাত্রী ব্যবস্থাপনা</h1>
+            <p className="text-muted-foreground mt-2">সকল ছাত্র/ছাত্রীদের তথ্য, এডিট এবং ডিলিট অপশন।</p>
           </div>
           <Button className="gap-2">
             <Plus className="h-4 w-4" />
@@ -43,18 +53,27 @@ export default function Students() {
           </Button>
         </div>
 
-        <div className="flex items-center gap-4 bg-card p-4 rounded-lg border shadow-sm">
-          <div className="relative flex-1 max-w-sm">
+        <div className="flex flex-col sm:flex-row items-center gap-4 bg-card p-4 rounded-lg border shadow-sm">
+          <div className="relative flex-1 w-full max-w-sm">
             <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
             <Input
               placeholder="নাম বা আইডি দিয়ে খুঁজুন..."
               className="pl-9"
             />
           </div>
-          <Button variant="outline" className="gap-2">
-            <Filter className="h-4 w-4" />
-            ফিল্টার
-          </Button>
+          <div className="flex items-center gap-2 w-full sm:w-auto">
+             <Select defaultValue="all">
+                <SelectTrigger className="w-[180px]">
+                  <SelectValue placeholder="বিভাগ নির্বাচন করুন" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">সকল বিভাগ</SelectItem>
+                  <SelectItem value="hefz">হেফজ বিভাগ</SelectItem>
+                  <SelectItem value="kitab">কিতাব বিভাগ</SelectItem>
+                  <SelectItem value="nazera">নাজেরা বিভাগ</SelectItem>
+                </SelectContent>
+              </Select>
+          </div>
         </div>
 
         <div className="rounded-md border bg-card shadow-sm">
@@ -97,10 +116,13 @@ export default function Students() {
                       </DropdownMenuTrigger>
                       <DropdownMenuContent align="end">
                         <DropdownMenuLabel>অ্যাকশন</DropdownMenuLabel>
-                        <DropdownMenuItem>বিস্তারিত দেখুন</DropdownMenuItem>
-                        <DropdownMenuItem>সম্পাদনা করুন</DropdownMenuItem>
+                        <DropdownMenuItem>
+                            <Edit className="mr-2 h-4 w-4" /> সম্পাদনা করুন
+                        </DropdownMenuItem>
                         <DropdownMenuSeparator />
-                        <DropdownMenuItem className="text-red-600">ডিলিট করুন</DropdownMenuItem>
+                        <DropdownMenuItem className="text-red-600" onClick={() => handleDelete(student.id)}>
+                            <Trash2 className="mr-2 h-4 w-4" /> ডিলিট করুন
+                        </DropdownMenuItem>
                       </DropdownMenuContent>
                     </DropdownMenu>
                   </TableCell>

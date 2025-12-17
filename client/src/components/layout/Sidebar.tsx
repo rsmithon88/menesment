@@ -8,22 +8,31 @@ import {
   CreditCard,
   Settings,
   LogOut,
-  UserPlus
+  UserPlus,
+  Banknote,
+  Bell
 } from "lucide-react";
-import logoImage from "@assets/generated_images/islamic_geometric_pattern_background.png"; // Using the pattern as a logo placeholder background
+import logoImage from "@assets/generated_images/islamic_geometric_pattern_background.png";
 
 const sidebarItems = [
   { icon: LayoutDashboard, label: "ড্যাশবোর্ড", href: "/" },
   { icon: Users, label: "ছাত্র/ছাত্রী", href: "/students" },
   { icon: UserPlus, label: "নতুন ভর্তি", href: "/admissions" },
   { icon: GraduationCap, label: "শিক্ষক/শিক্ষিকা", href: "/teachers" },
+  { icon: Banknote, label: "বেতন (শিক্ষক)", href: "/salary" },
   { icon: BookOpen, label: "ক্লাস রুটিন", href: "/classes" },
-  { icon: CreditCard, label: "বেতন/ফি", href: "/fees" },
+  { icon: CreditCard, label: "ফি আদায়", href: "/fees" },
+  { icon: Bell, label: "নোটিফিকেশন", href: "/notifications" },
   { icon: Settings, label: "সেটিংস", href: "/settings" },
 ];
 
 export function Sidebar() {
-  const [location] = useLocation();
+  const [location, setLocation] = useLocation();
+
+  const handleLogout = () => {
+    // In a real app, clear auth tokens here
+    setLocation("/login");
+  };
 
   return (
     <aside className="fixed inset-y-0 left-0 z-50 w-64 bg-sidebar border-r border-sidebar-border hidden md:flex flex-col">
@@ -59,7 +68,7 @@ export function Sidebar() {
       </div>
 
       <div className="p-4 border-t border-sidebar-border">
-        <button className="flex w-full items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-destructive hover:bg-destructive/10 transition-colors">
+        <button onClick={handleLogout} className="flex w-full items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-destructive hover:bg-destructive/10 transition-colors">
           <LogOut className="h-4 w-4" />
           লগ আউট
         </button>
