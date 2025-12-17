@@ -89,6 +89,30 @@ export default function Dashboard() {
           ))}
         </div>
 
+        {/* Expense Section */}
+        <div className="mt-8">
+          <h1 className="text-xl font-medium text-foreground mb-4">আয়ের উৎস</h1>
+          {/* Income source placeholder if needed, matching screenshot layout */}
+          
+          <h1 className="text-xl font-medium text-foreground mb-4 mt-8">ব্যয়ের খাত</h1>
+          <div className="grid grid-cols-2 gap-4">
+            {expenses.map((expense, index) => (
+              <Card key={index} className="border-none shadow-sm relative overflow-hidden">
+                <CardContent className="p-4">
+                  <div className="flex items-start justify-between mb-2">
+                     <div className="h-8 w-8 rounded-full bg-gray-100 flex items-center justify-center text-gray-600">
+                        <expense.icon className="h-4 w-4" />
+                     </div>
+                     <span className="text-[10px] bg-red-100 text-red-500 px-2 py-0.5 rounded-full">ব্যয়</span>
+                  </div>
+                  <p className="text-sm font-medium mb-1">{expense.name}</p>
+                  <h3 className="text-lg font-bold">{expense.amount}</h3>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+        </div>
+
         {/* Charts Section */}
         <h1 className="text-xl font-medium text-foreground mt-8 mb-4">ড্যাশবোর্ড বিশ্লেষণ</h1>
         <div className="grid md:grid-cols-2 gap-6">
@@ -147,30 +171,6 @@ export default function Dashboard() {
               </div>
             </CardContent>
           </Card>
-        </div>
-
-        {/* Expense Section */}
-        <div className="mt-8">
-          <h1 className="text-xl font-medium text-foreground mb-4">আয়ের উৎস</h1>
-          {/* Income source placeholder if needed, matching screenshot layout */}
-          
-          <h1 className="text-xl font-medium text-foreground mb-4 mt-8">ব্যয়ের খাত</h1>
-          <div className="grid grid-cols-2 gap-4">
-            {expenses.map((expense, index) => (
-              <Card key={index} className="border-none shadow-sm relative overflow-hidden">
-                <CardContent className="p-4">
-                  <div className="flex items-start justify-between mb-2">
-                     <div className="h-8 w-8 rounded-full bg-gray-100 flex items-center justify-center text-gray-600">
-                        <expense.icon className="h-4 w-4" />
-                     </div>
-                     <span className="text-[10px] bg-red-100 text-red-500 px-2 py-0.5 rounded-full">ব্যয়</span>
-                  </div>
-                  <p className="text-sm font-medium mb-1">{expense.name}</p>
-                  <h3 className="text-lg font-bold">{expense.amount}</h3>
-                </CardContent>
-              </Card>
-            ))}
-          </div>
         </div>
 
         {/* Floating Action Button */}
