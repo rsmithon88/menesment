@@ -2,7 +2,7 @@ import { Bell, Search, Menu } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
+import { Sheet, SheetContent, SheetTrigger, SheetTitle, SheetDescription } from "@/components/ui/sheet";
 import { SidebarContent } from "./Sidebar";
 
 export function Header() {
@@ -16,6 +16,8 @@ export function Header() {
             </Button>
           </SheetTrigger>
           <SheetContent side="left" className="p-0 w-64 bg-sidebar border-r border-sidebar-border">
+            <SheetTitle className="sr-only">Navigation Menu</SheetTitle>
+            <SheetDescription className="sr-only">Main navigation sidebar</SheetDescription>
             <SidebarContent />
           </SheetContent>
         </Sheet>
