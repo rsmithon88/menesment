@@ -26,7 +26,7 @@ const sidebarItems = [
   { icon: Settings, label: "সেটিংস", href: "/settings" },
 ];
 
-export function Sidebar() {
+export function SidebarContent() {
   const [location, setLocation] = useLocation();
 
   const handleLogout = () => {
@@ -35,7 +35,7 @@ export function Sidebar() {
   };
 
   return (
-    <aside className="fixed inset-y-0 left-0 z-50 w-64 bg-sidebar border-r border-sidebar-border hidden md:flex flex-col">
+    <div className="flex flex-col h-full">
       <div className="h-16 flex items-center px-6 border-b border-sidebar-border">
         <div className="flex items-center gap-3">
           <div className="h-8 w-8 rounded-lg overflow-hidden bg-primary/10 relative flex items-center justify-center">
@@ -67,12 +67,20 @@ export function Sidebar() {
         })}
       </div>
 
-      <div className="p-4 border-t border-sidebar-border">
+      <div className="p-4 border-t border-sidebar-border mt-auto">
         <button onClick={handleLogout} className="flex w-full items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-destructive hover:bg-destructive/10 transition-colors">
           <LogOut className="h-4 w-4" />
           লগ আউট
         </button>
       </div>
+    </div>
+  );
+}
+
+export function Sidebar() {
+  return (
+    <aside className="fixed inset-y-0 left-0 z-50 w-64 bg-sidebar border-r border-sidebar-border hidden md:flex flex-col">
+      <SidebarContent />
     </aside>
   );
 }
