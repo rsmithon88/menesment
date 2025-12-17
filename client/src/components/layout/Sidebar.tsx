@@ -49,8 +49,11 @@ const sidebarItems = [
   { icon: Settings, label: "সেটিংস", href: "/settings" },
 ];
 
+import { useSettings } from "@/hooks/use-settings";
+
 export function SidebarContent() {
   const [location, setLocation] = useLocation();
+  const { madrasaName } = useSettings();
 
   const handleLogout = () => {
     setLocation("/login");
@@ -60,7 +63,7 @@ export function SidebarContent() {
     <div className="flex flex-col h-full bg-[#1e40af] text-white">
       <div className="h-16 flex items-center px-6 border-b border-blue-500/30">
         <div className="flex items-center gap-3 w-full justify-between">
-          <span className="font-bold text-lg tracking-tight truncate">দারুল জান্নাত মহিলা কওমী ...</span>
+          <span className="font-bold text-lg tracking-tight truncate" title={madrasaName}>{madrasaName}</span>
         </div>
       </div>
 
