@@ -12,6 +12,7 @@ import Fees from "@/pages/fees";
 import Login from "@/pages/login";
 import Salary from "@/pages/salary";
 import Notifications from "@/pages/notifications";
+import TeacherAttendance from "@/pages/teacher-attendance";
 
 function Router() {
   return (
@@ -21,6 +22,7 @@ function Router() {
       <Route path="/students" component={Students} />
       <Route path="/admissions" component={Admissions} />
       <Route path="/teachers" component={Teachers} />
+      <Route path="/teacher-attendance" component={TeacherAttendance} />
       <Route path="/fees" component={Fees} />
       <Route path="/salary" component={Salary} />
       <Route path="/notifications" component={Notifications} />
