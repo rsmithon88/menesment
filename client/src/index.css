@@ -14,7 +14,7 @@
     box-sizing: border-box;
   }
   body {
-    font-family: 'Hind Siliguri', 'Inter', sans-serif;
+    font-family: 'SolaimanLipi', 'Inter', sans-serif;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
     margin: 0;
@@ -22,10 +22,10 @@
     color: #1e293b;
   }
   h1, h2, h3, h4, h5, h6 {
-    font-family: 'Hind Siliguri', sans-serif;
+    font-family: 'SolaimanLipi', sans-serif;
     font-weight: 700;
   }
   input, select, textarea {
-    font-family: 'Hind Siliguri', 'Inter', sans-serif;
+    font-family: 'SolaimanLipi', 'Inter', sans-serif;
   }
 }

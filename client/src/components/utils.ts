@@ -109,11 +109,19 @@ export function printContent(elementId: string, documentTitle: string, extraCss:
             <head>
                 <title>${documentTitle}</title>
                 <script src="https://cdn.tailwindcss.com"></script>
-                <link rel="preload" as="font" type="font/woff2" href="https://banglawebfonts.pages.dev/fonts/kalpurush/kalpurush-regular.woff2" crossorigin="anonymous">
                 <style>
-                    @import url('https://banglawebfonts.pages.dev/css/kalpurush.css');
+                    @font-face {
+                        font-family: 'SolaimanLipi';
+                        src: url('https://cdn.jsdelivr.net/gh/nicholasgasior/fonts-solaimanlipi@master/SolaimanLipi.woff2') format('woff2');
+                        font-weight: normal; font-style: normal;
+                    }
+                    @font-face {
+                        font-family: 'SolaimanLipi';
+                        src: url('https://cdn.jsdelivr.net/gh/nicholasgasior/fonts-solaimanlipi@master/SolaimanLipi_Bold.woff2') format('woff2');
+                        font-weight: bold; font-style: normal;
+                    }
                     body { 
-                        font-family: 'Kalpurush', serif !important; 
+                        font-family: 'SolaimanLipi', serif !important; 
                         -webkit-print-color-adjust: exact !important;
                     }
                     @media print {
