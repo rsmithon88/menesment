@@ -1,314 +1,280 @@
 import type { Express } from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./storage";
-import {
-  insertStudentSchema, insertTeacherSchema, insertFeeSchema,
-  insertExpenseSchema, insertSalarySchema, insertCourseSchema,
-  insertExamSchema, insertResultSchema, insertRoutineSchema,
-  insertLibraryBookSchema, insertLeaveApplicationSchema,
-  insertNotificationSchema, insertEventSchema, insertActivityLogSchema,
-} from "@shared/schema";
 
 export async function registerRoutes(
   httpServer: Server,
   app: Express
 ): Promise<Server> {
 
-  app.get("/api/dashboard/stats", async (_req, res) => {
-    const stats = await storage.getDashboardStats();
-    res.json(stats);
+  app.post("/api/auth/login", async (req, res) => {
+    try {
+      const { email, password } = req.body;
+      if (!email || !password) {
+        return res.status(400).json({ message: 'ইমেইল এবং পাসওয়ার্ড প্রয়োজন।' });
+      }
+      const user = await storage.getUserByUsername(email);
+      if (user && user.password === password) {
+        return res.json({
+          id: user.id,
+          name: user.name,
+          email: user.email || email,
+          role: user.role || 'admin',
+          photoURL: user.photoURL,
+        });
+      }
+      const teacher = await storage.getTeacherByEmail(email);
+      if (teacher && teacher.password && teacher.password === password) {
+        return res.json({
+          id: teacher.id,
+          name: teacher.name,
+          email: teacher.email,
+          role: teacher.isSuperAdmin ? 'super_admin' : 'teacher',
+          photoURL: teacher.photoURL,
+        });
+      }
+      return res.status(401).json({ message: 'ভুল ইমেইল অথবা পাসওয়ার্ড।' });
+    } catch (error: any) {
+      res.status(500).json({ message: error.message });
+    }
   });
 
-  app.get("/api/students", async (_req, res) => {
-    const data = await storage.getStudents();
-    res.json(data);
+  const collections: Record<string, any> = {
+    students: {
+      getAll: () => storage.getStudents(),
+      create: (d: any) => storage.createStudent(d),
+      update: (id: number, d: any) => storage.updateStudent(id, d),
+      delete: (id: number) => storage.deleteStudent(id),
+    },
+    teachers: {
+      getAll: () => storage.getTeachers(),
+      create: (d: any) => storage.createTeacher(d),
+      update: (id: number, d: any) => storage.updateTeacher(id, d),
+      delete: (id: number) => storage.deleteTeacher(id),
+    },
+    courses: {
+      getAll: () => storage.getCourses(),
+      create: (d: any) => storage.createCourse(d),
+      update: (id: number, d: any) => storage.updateCourse(id, d),
+      delete: (id: number) => storage.deleteCourse(id),
+    },
+    attendance: {
+      getAll: () => storage.getAttendance(),
+      create: (d: any) => storage.createAttendance(d),
+      update: (id: number, d: any) => storage.updateAttendance(id, d),
+      delete: (id: number) => storage.deleteAttendance(id),
+    },
+    teacherAttendance: {
+      getAll: () => storage.getTeacherAttendance(),
+      create: (d: any) => storage.createTeacherAttendance(d),
+    },
+    fees: {
+      getAll: () => storage.getFees(),
+      create: (d: any) => storage.createFee(d),
+      update: (id: number, d: any) => storage.updateFee(id, d),
+      delete: (id: number) => storage.deleteFee(id),
+    },
+    expenses: {
+      getAll: () => storage.getExpenses(),
+      create: (d: any) => storage.createExpense(d),
+      update: (id: number, d: any) => storage.updateExpense(id, d),
+      delete: (id: number) => storage.deleteExpense(id),
+    },
+    teacherSalaries: {
+      getAll: () => storage.getTeacherSalaries(),
+      create: (d: any) => storage.createTeacherSalary(d),
+      update: (id: number, d: any) => storage.updateTeacherSalary(id, d),
+      delete: (id: number) => storage.deleteTeacherSalary(id),
+    },
+    exams: {
+      getAll: () => storage.getExams(),
+      create: (d: any) => storage.createExam(d),
+      update: (id: number, d: any) => storage.updateExam(id, d),
+      delete: (id: number) => storage.deleteExam(id),
+    },
+    results: {
+      getAll: () => storage.getResults(),
+      create: (d: any) => storage.createResult(d),
+      update: (id: number, d: any) => storage.updateResult(id, d),
+      delete: (id: number) => storage.deleteResult(id),
+    },
+    timetable: {
+      getAll: () => storage.getTimetable(),
+      create: (d: any) => storage.createTimetableEntry(d),
+      update: (id: number, d: any) => storage.updateTimetableEntry(id, d),
+      delete: (id: number) => storage.deleteTimetableEntry(id),
+    },
+    books: {
+      getAll: () => storage.getBooks(),
+      create: (d: any) => storage.createBook(d),
+      update: (id: number, d: any) => storage.updateBook(id, d),
+      delete: (id: number) => storage.deleteBook(id),
+    },
+    librarySections: {
+      getAll: () => storage.getLibrarySections(),
+      create: (d: any) => storage.createLibrarySection(d),
+      update: (id: number, d: any) => storage.updateLibrarySection(id, d),
+      delete: (id: number) => storage.deleteLibrarySection(id),
+    },
+    notices: {
+      getAll: () => storage.getNotices(),
+      create: (d: any) => storage.createNotice(d),
+      update: (id: number, d: any) => storage.updateNotice(id, d),
+      delete: (id: number) => storage.deleteNotice(id),
+    },
+    events: {
+      getAll: () => storage.getEvents(),
+      create: (d: any) => storage.createEvent(d),
+      update: (id: number, d: any) => storage.updateEvent(id, d),
+      delete: (id: number) => storage.deleteEvent(id),
+    },
+    notifications: {
+      getAll: () => storage.getNotifications(),
+      create: (d: any) => storage.createNotification(d),
+      update: (id: number, d: any) => storage.updateNotification(id, d),
+    },
+    admitCards: {
+      getAll: () => storage.getAdmitCards(),
+      create: (d: any) => storage.createAdmitCard(d),
+      update: (id: number, d: any) => storage.updateAdmitCard(id, d),
+      delete: (id: number) => storage.deleteAdmitCard(id),
+    },
+    leaves: {
+      getAll: () => storage.getLeaves(),
+      create: (d: any) => storage.createLeave(d),
+      update: (id: number, d: any) => storage.updateLeave(id, d),
+      delete: (id: number) => storage.deleteLeave(id),
+    },
+    activityLog: {
+      getAll: () => storage.getActivityLog(),
+      create: (d: any) => storage.createActivityLog(d),
+    },
+    activeSessions: {
+      getAll: () => storage.getActiveSessions(),
+    },
+  };
+
+  for (const [name, ops] of Object.entries(collections)) {
+    if (ops.getAll) {
+      app.get(`/api/${name}`, async (_req, res) => {
+        try {
+          const data = await ops.getAll();
+          res.json(data);
+        } catch (error: any) {
+          res.status(500).json({ message: error.message });
+        }
+      });
+    }
+
+    if (ops.create) {
+      app.post(`/api/${name}`, async (req, res) => {
+        try {
+          const result = await ops.create(req.body);
+          res.status(201).json(result);
+        } catch (error: any) {
+          res.status(500).json({ message: error.message });
+        }
+      });
+    }
+
+    if (ops.update) {
+      app.patch(`/api/${name}/:id`, async (req, res) => {
+        try {
+          const result = await ops.update(Number(req.params.id), req.body);
+          if (!result) return res.status(404).json({ message: 'Not found' });
+          res.json(result);
+        } catch (error: any) {
+          res.status(500).json({ message: error.message });
+        }
+      });
+    }
+
+    if (ops.delete) {
+      app.delete(`/api/${name}/:id`, async (req, res) => {
+        try {
+          await ops.delete(Number(req.params.id));
+          res.json({ success: true });
+        } catch (error: any) {
+          res.status(500).json({ message: error.message });
+        }
+      });
+    }
+  }
+
+  app.post("/api/students/bulk", async (req, res) => {
+    try {
+      const result = await storage.createMultipleStudents(req.body);
+      res.status(201).json(result);
+    } catch (error: any) {
+      res.status(500).json({ message: error.message });
+    }
   });
 
-  app.get("/api/students/:id", async (req, res) => {
-    const student = await storage.getStudent(Number(req.params.id));
-    if (!student) return res.status(404).json({ message: "Student not found" });
-    res.json(student);
+  app.post("/api/fees/bulk", async (req, res) => {
+    try {
+      const result = await storage.createMultipleFees(req.body);
+      res.status(201).json(result);
+    } catch (error: any) {
+      res.status(500).json({ message: error.message });
+    }
   });
 
-  app.post("/api/students", async (req, res) => {
-    const parsed = insertStudentSchema.safeParse(req.body);
-    if (!parsed.success) return res.status(400).json({ message: parsed.error.message });
-    const student = await storage.createStudent(parsed.data);
-    await storage.createActivityLog({ action: "নতুন ছাত্র ভর্তি", details: student.nameBn, user: "অ্যাডমিন", timestamp: new Date().toISOString() });
-    res.status(201).json(student);
-  });
-
-  app.patch("/api/students/:id", async (req, res) => {
-    const updated = await storage.updateStudent(Number(req.params.id), req.body);
-    if (!updated) return res.status(404).json({ message: "Student not found" });
-    res.json(updated);
-  });
-
-  app.delete("/api/students/:id", async (req, res) => {
-    await storage.deleteStudent(Number(req.params.id));
-    await storage.createActivityLog({ action: "ছাত্র ডিলিট", details: `ID: ${req.params.id}`, user: "অ্যাডমিন", timestamp: new Date().toISOString() });
-    res.json({ success: true });
-  });
-
-  app.get("/api/teachers", async (_req, res) => {
-    const data = await storage.getTeachers();
-    res.json(data);
-  });
-
-  app.post("/api/teachers", async (req, res) => {
-    const parsed = insertTeacherSchema.safeParse(req.body);
-    if (!parsed.success) return res.status(400).json({ message: parsed.error.message });
-    const teacher = await storage.createTeacher(parsed.data);
-    await storage.createActivityLog({ action: "নতুন শিক্ষক যোগ", details: teacher.name, user: "অ্যাডমিন", timestamp: new Date().toISOString() });
-    res.status(201).json(teacher);
-  });
-
-  app.patch("/api/teachers/:id", async (req, res) => {
-    const updated = await storage.updateTeacher(Number(req.params.id), req.body);
-    if (!updated) return res.status(404).json({ message: "Teacher not found" });
-    res.json(updated);
-  });
-
-  app.delete("/api/teachers/:id", async (req, res) => {
-    await storage.deleteTeacher(Number(req.params.id));
-    await storage.createActivityLog({ action: "শিক্ষক ডিলিট", details: `ID: ${req.params.id}`, user: "অ্যাডমিন", timestamp: new Date().toISOString() });
-    res.json({ success: true });
-  });
-
-  app.get("/api/teacher-attendance/:date", async (req, res) => {
-    const data = await storage.getTeacherAttendance(req.params.date);
-    res.json(data);
-  });
-
-  app.post("/api/teacher-attendance", async (req, res) => {
-    const data = await storage.saveTeacherAttendance(req.body.records);
-    res.json(data);
-  });
-
-  app.get("/api/student-attendance/:date", async (req, res) => {
-    const data = await storage.getStudentAttendance(req.params.date);
-    res.json(data);
-  });
-
-  app.post("/api/student-attendance", async (req, res) => {
-    const data = await storage.saveStudentAttendance(req.body.records);
-    res.json(data);
-  });
-
-  app.get("/api/fees", async (_req, res) => {
-    const data = await storage.getFees();
-    res.json(data);
-  });
-
-  app.post("/api/fees", async (req, res) => {
-    const parsed = insertFeeSchema.safeParse(req.body);
-    if (!parsed.success) return res.status(400).json({ message: parsed.error.message });
-    const fee = await storage.createFee(parsed.data);
-    await storage.createActivityLog({ action: "ফি গ্রহণ", details: `${fee.studentName} - ৳${fee.amount}`, user: "অ্যাডমিন", timestamp: new Date().toISOString() });
-    res.status(201).json(fee);
-  });
-
-  app.patch("/api/fees/:id", async (req, res) => {
-    const updated = await storage.updateFee(Number(req.params.id), req.body);
-    if (!updated) return res.status(404).json({ message: "Fee not found" });
-    res.json(updated);
-  });
-
-  app.get("/api/expenses", async (_req, res) => {
-    const data = await storage.getExpenses();
-    res.json(data);
-  });
-
-  app.post("/api/expenses", async (req, res) => {
-    const parsed = insertExpenseSchema.safeParse(req.body);
-    if (!parsed.success) return res.status(400).json({ message: parsed.error.message });
-    const expense = await storage.createExpense(parsed.data);
-    await storage.createActivityLog({ action: "নতুন ব্যয় যোগ", details: `${expense.category} - ৳${expense.amount}`, user: "অ্যাডমিন", timestamp: new Date().toISOString() });
-    res.status(201).json(expense);
-  });
-
-  app.delete("/api/expenses/:id", async (req, res) => {
-    await storage.deleteExpense(Number(req.params.id));
-    res.json({ success: true });
-  });
-
-  app.get("/api/salaries", async (_req, res) => {
-    const data = await storage.getSalaries();
-    res.json(data);
-  });
-
-  app.post("/api/salaries", async (req, res) => {
-    const parsed = insertSalarySchema.safeParse(req.body);
-    if (!parsed.success) return res.status(400).json({ message: parsed.error.message });
-    const salary = await storage.createSalary(parsed.data);
-    await storage.createActivityLog({ action: "বেতন পরিশোধ", details: `${salary.teacherName} - ৳${salary.amount}`, user: "অ্যাডমিন", timestamp: new Date().toISOString() });
-    res.status(201).json(salary);
-  });
-
-  app.patch("/api/salaries/:id", async (req, res) => {
-    const updated = await storage.updateSalary(Number(req.params.id), req.body);
-    if (!updated) return res.status(404).json({ message: "Salary not found" });
-    res.json(updated);
-  });
-
-  app.get("/api/courses", async (_req, res) => {
-    const data = await storage.getCourses();
-    res.json(data);
-  });
-
-  app.post("/api/courses", async (req, res) => {
-    const parsed = insertCourseSchema.safeParse(req.body);
-    if (!parsed.success) return res.status(400).json({ message: parsed.error.message });
-    const course = await storage.createCourse(parsed.data);
-    res.status(201).json(course);
-  });
-
-  app.patch("/api/courses/:id", async (req, res) => {
-    const updated = await storage.updateCourse(Number(req.params.id), req.body);
-    if (!updated) return res.status(404).json({ message: "Course not found" });
-    res.json(updated);
-  });
-
-  app.delete("/api/courses/:id", async (req, res) => {
-    await storage.deleteCourse(Number(req.params.id));
-    res.json({ success: true });
-  });
-
-  app.get("/api/exams", async (_req, res) => {
-    const data = await storage.getExams();
-    res.json(data);
-  });
-
-  app.post("/api/exams", async (req, res) => {
-    const parsed = insertExamSchema.safeParse(req.body);
-    if (!parsed.success) return res.status(400).json({ message: parsed.error.message });
-    const exam = await storage.createExam(parsed.data);
-    res.status(201).json(exam);
-  });
-
-  app.delete("/api/exams/:id", async (req, res) => {
-    await storage.deleteExam(Number(req.params.id));
-    res.json({ success: true });
-  });
-
-  app.get("/api/results", async (_req, res) => {
-    const data = await storage.getResults();
-    res.json(data);
-  });
-
-  app.get("/api/results/exam/:examId", async (req, res) => {
-    const data = await storage.getResultsByExam(Number(req.params.examId));
-    res.json(data);
-  });
-
-  app.post("/api/results", async (req, res) => {
-    const parsed = insertResultSchema.safeParse(req.body);
-    if (!parsed.success) return res.status(400).json({ message: parsed.error.message });
-    const result = await storage.createResult(parsed.data);
-    res.status(201).json(result);
-  });
-
-  app.get("/api/routines", async (_req, res) => {
-    const data = await storage.getRoutines();
-    res.json(data);
-  });
-
-  app.post("/api/routines", async (req, res) => {
-    const parsed = insertRoutineSchema.safeParse(req.body);
-    if (!parsed.success) return res.status(400).json({ message: parsed.error.message });
-    const routine = await storage.createRoutine(parsed.data);
-    res.status(201).json(routine);
-  });
-
-  app.delete("/api/routines/:id", async (req, res) => {
-    await storage.deleteRoutine(Number(req.params.id));
-    res.json({ success: true });
-  });
-
-  app.get("/api/library", async (_req, res) => {
-    const data = await storage.getLibraryBooks();
-    res.json(data);
-  });
-
-  app.post("/api/library", async (req, res) => {
-    const parsed = insertLibraryBookSchema.safeParse(req.body);
-    if (!parsed.success) return res.status(400).json({ message: parsed.error.message });
-    const book = await storage.createLibraryBook(parsed.data);
-    res.status(201).json(book);
-  });
-
-  app.patch("/api/library/:id", async (req, res) => {
-    const updated = await storage.updateLibraryBook(Number(req.params.id), req.body);
-    if (!updated) return res.status(404).json({ message: "Book not found" });
-    res.json(updated);
-  });
-
-  app.delete("/api/library/:id", async (req, res) => {
-    await storage.deleteLibraryBook(Number(req.params.id));
-    res.json({ success: true });
-  });
-
-  app.get("/api/leave", async (_req, res) => {
-    const data = await storage.getLeaveApplications();
-    res.json(data);
-  });
-
-  app.post("/api/leave", async (req, res) => {
-    const parsed = insertLeaveApplicationSchema.safeParse(req.body);
-    if (!parsed.success) return res.status(400).json({ message: parsed.error.message });
-    const leave = await storage.createLeaveApplication(parsed.data);
-    res.status(201).json(leave);
-  });
-
-  app.patch("/api/leave/:id", async (req, res) => {
-    const updated = await storage.updateLeaveApplication(Number(req.params.id), req.body);
-    if (!updated) return res.status(404).json({ message: "Leave application not found" });
-    res.json(updated);
-  });
-
-  app.get("/api/notifications", async (_req, res) => {
-    const data = await storage.getNotifications();
-    res.json(data);
-  });
-
-  app.post("/api/notifications", async (req, res) => {
-    const parsed = insertNotificationSchema.safeParse(req.body);
-    if (!parsed.success) return res.status(400).json({ message: parsed.error.message });
-    const notification = await storage.createNotification(parsed.data);
-    res.status(201).json(notification);
-  });
-
-  app.get("/api/events", async (_req, res) => {
-    const data = await storage.getEvents();
-    res.json(data);
-  });
-
-  app.post("/api/events", async (req, res) => {
-    const parsed = insertEventSchema.safeParse(req.body);
-    if (!parsed.success) return res.status(400).json({ message: parsed.error.message });
-    const event = await storage.createEvent(parsed.data);
-    res.status(201).json(event);
-  });
-
-  app.delete("/api/events/:id", async (req, res) => {
-    await storage.deleteEvent(Number(req.params.id));
-    res.json({ success: true });
-  });
-
-  app.get("/api/activity", async (_req, res) => {
-    const data = await storage.getActivityLog();
-    res.json(data);
+  app.post("/api/notifications/mark-all-read", async (_req, res) => {
+    try {
+      await storage.updateAllNotificationsRead();
+      res.json({ success: true });
+    } catch (error: any) {
+      res.status(500).json({ message: error.message });
+    }
   });
 
   app.get("/api/settings/:key", async (req, res) => {
-    const setting = await storage.getSetting(req.params.key);
-    res.json(setting || { key: req.params.key, value: "" });
+    try {
+      const setting = await storage.getSetting(req.params.key);
+      if (setting) {
+        res.json(JSON.parse(setting.value));
+      } else {
+        res.json(null);
+      }
+    } catch (error: any) {
+      res.status(500).json({ message: error.message });
+    }
   });
 
-  app.post("/api/settings", async (req, res) => {
-    const { key, value } = req.body;
-    const setting = await storage.upsertSetting(key, value);
-    res.json(setting);
+  app.post("/api/settings/:key", async (req, res) => {
+    try {
+      const setting = await storage.upsertSetting(req.params.key, JSON.stringify(req.body));
+      res.json(setting);
+    } catch (error: any) {
+      res.status(500).json({ message: error.message });
+    }
+  });
+
+  app.post("/api/activeSessions/upsert", async (req, res) => {
+    try {
+      const result = await storage.upsertActiveSession(req.body.userId, req.body);
+      res.json(result);
+    } catch (error: any) {
+      res.status(500).json({ message: error.message });
+    }
+  });
+
+  app.delete("/api/activeSessions/user/:userId", async (req, res) => {
+    try {
+      await storage.deleteActiveSession(req.params.userId);
+      res.json({ success: true });
+    } catch (error: any) {
+      res.status(500).json({ message: error.message });
+    }
+  });
+
+  app.post("/api/receipt-number", async (_req, res) => {
+    try {
+      const num = await storage.getNextReceiptNumber();
+      res.json({ receiptNumber: num });
+    } catch (error: any) {
+      res.status(500).json({ message: error.message });
+    }
   });
 
   return httpServer;

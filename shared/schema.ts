@@ -1,5 +1,5 @@
 import { sql } from "drizzle-orm";
-import { pgTable, text, varchar, serial, integer, date, timestamp, boolean } from "drizzle-orm/pg-core";
+import { pgTable, text, serial, integer, boolean, jsonb } from "drizzle-orm/pg-core";
 import { createInsertSchema } from "drizzle-zod";
 import { z } from "zod";
 
@@ -7,164 +7,226 @@ export const users = pgTable("users", {
   id: serial("id").primaryKey(),
   username: text("username").notNull().unique(),
   password: text("password").notNull(),
+  name: text("name").notNull().default("অ্যাডমিন"),
+  email: text("email"),
+  role: text("role").notNull().default("admin"),
+  photoURL: text("photo_url"),
 });
 
 export const students = pgTable("students", {
   id: serial("id").primaryKey(),
-  studentId: text("student_id").notNull().unique(),
-  nameBn: text("name_bn").notNull(),
-  nameEn: text("name_en"),
-  fatherName: text("father_name"),
-  motherName: text("mother_name"),
-  dob: text("dob"),
-  gender: text("gender"),
-  department: text("department").notNull(),
-  roll: text("roll"),
-  session: text("session"),
+  rollNumber: integer("roll_number").notNull().default(0),
+  name: text("name").notNull(),
+  fatherName: text("father_name").notNull().default(""),
+  motherName: text("mother_name").notNull().default(""),
+  class: text("class").notNull().default(""),
+  age: integer("age").notNull().default(0),
+  parentContact: text("parent_contact").notNull().default(""),
   address: text("address"),
-  phone: text("phone"),
+  gender: text("gender").notNull().default("male"),
   status: text("status").notNull().default("active"),
-  feeStatus: text("fee_status").notNull().default("due"),
+  addedBy: text("added_by"),
+  lastModifiedBy: text("last_modified_by"),
 });
 
 export const teachers = pgTable("teachers", {
   id: serial("id").primaryKey(),
+  uid: text("uid"),
   name: text("name").notNull(),
   subject: text("subject").notNull(),
+  email: text("email").notNull().default(""),
+  password: text("password"),
   phone: text("phone"),
-  email: text("email"),
+  address: text("address"),
+  designation: text("designation").notNull().default("সাধারণ শিক্ষক"),
+  responsibilities: jsonb("responsibilities").$type<string[]>().notNull().default([]),
+  gender: text("gender").notNull().default("male"),
+  isSuperAdmin: boolean("is_super_admin").default(false),
+  photoURL: text("photo_url"),
   salary: integer("salary").default(0),
-  status: text("status").notNull().default("active"),
-});
-
-export const teacherAttendance = pgTable("teacher_attendance", {
-  id: serial("id").primaryKey(),
-  teacherId: integer("teacher_id").notNull(),
-  date: text("date").notNull(),
-  status: text("status").notNull(),
-});
-
-export const studentAttendance = pgTable("student_attendance", {
-  id: serial("id").primaryKey(),
-  studentId: integer("student_id").notNull(),
-  date: text("date").notNull(),
-  status: text("status").notNull(),
-});
-
-export const fees = pgTable("fees", {
-  id: serial("id").primaryKey(),
-  invoiceId: text("invoice_id").notNull(),
-  studentId: integer("student_id").notNull(),
-  studentName: text("student_name").notNull(),
-  type: text("type").notNull(),
-  month: text("month").notNull(),
-  amount: integer("amount").notNull(),
-  status: text("status").notNull().default("due"),
-  date: text("date"),
-});
-
-export const expenses = pgTable("expenses", {
-  id: serial("id").primaryKey(),
-  category: text("category").notNull(),
-  description: text("description"),
-  amount: integer("amount").notNull(),
-  date: text("date").notNull(),
-});
-
-export const salaries = pgTable("salaries", {
-  id: serial("id").primaryKey(),
-  salaryId: text("salary_id").notNull(),
-  teacherId: integer("teacher_id").notNull(),
-  teacherName: text("teacher_name").notNull(),
-  month: text("month").notNull(),
-  amount: integer("amount").notNull(),
-  status: text("status").notNull().default("pending"),
-  date: text("date"),
+  addedBy: text("added_by"),
+  lastModifiedBy: text("last_modified_by"),
 });
 
 export const courses = pgTable("courses", {
   id: serial("id").primaryKey(),
   name: text("name").notNull(),
-  department: text("department").notNull(),
-  teacher: text("teacher"),
-  description: text("description"),
-  schedule: text("schedule"),
+  instructor: text("instructor"),
+  duration: text("duration"),
+  addedBy: text("added_by"),
+  lastModifiedBy: text("last_modified_by"),
+});
+
+export const studentAttendance = pgTable("student_attendance", {
+  id: serial("id").primaryKey(),
+  studentId: text("student_id").notNull(),
+  date: text("date").notNull(),
+  status: text("status").notNull(),
+  addedBy: text("added_by"),
+  lastModifiedBy: text("last_modified_by"),
+});
+
+export const teacherAttendance = pgTable("teacher_attendance", {
+  id: serial("id").primaryKey(),
+  teacherId: text("teacher_id").notNull(),
+  date: text("date").notNull(),
+  time: text("time").notNull().default(""),
+  status: text("status").notNull().default("উপস্থিত"),
+});
+
+export const fees = pgTable("fees", {
+  id: serial("id").primaryKey(),
+  studentId: text("student_id").notNull(),
+  amount: integer("amount").notNull(),
+  dueDate: text("due_date").notNull(),
+  status: text("status").notNull().default("অপরিশোধিত"),
+  category: text("category").notNull().default(""),
+  addedBy: text("added_by"),
+  lastModifiedBy: text("last_modified_by"),
+  receiptNumber: integer("receipt_number"),
+  bookNumber: integer("book_number"),
+  paymentDate: text("payment_date"),
+  generatedBy: text("generated_by"),
+});
+
+export const expenses = pgTable("expenses", {
+  id: serial("id").primaryKey(),
+  title: text("title").notNull(),
+  category: text("category").notNull(),
+  amount: integer("amount").notNull(),
+  date: text("date").notNull(),
+  addedBy: text("added_by"),
+  lastModifiedBy: text("last_modified_by"),
+});
+
+export const teacherSalaries = pgTable("teacher_salaries", {
+  id: serial("id").primaryKey(),
+  teacherId: text("teacher_id").notNull(),
+  amount: integer("amount").notNull(),
+  month: text("month").notNull(),
+  year: integer("year").notNull(),
+  status: text("status").notNull().default("অপরিশোধিত"),
+  paymentDate: text("payment_date"),
+  addedBy: text("added_by"),
+  lastModifiedBy: text("last_modified_by"),
 });
 
 export const exams = pgTable("exams", {
   id: serial("id").primaryKey(),
   name: text("name").notNull(),
-  department: text("department").notNull(),
+  courseId: text("course_id").notNull(),
   date: text("date").notNull(),
-  totalMarks: integer("total_marks").default(100),
-  description: text("description"),
+  addedBy: text("added_by"),
+  lastModifiedBy: text("last_modified_by"),
 });
 
 export const results = pgTable("results", {
   id: serial("id").primaryKey(),
-  examId: integer("exam_id").notNull(),
-  studentId: integer("student_id").notNull(),
-  studentName: text("student_name").notNull(),
-  department: text("department").notNull(),
-  marks: integer("marks").notNull(),
-  grade: text("grade"),
-  examName: text("exam_name"),
+  studentId: text("student_id").notNull(),
+  examId: text("exam_id").notNull(),
+  results: jsonb("results").$type<{ subject: string; marks: number; totalMarks: number }[]>().notNull().default([]),
+  totalMarks: integer("total_marks").notNull().default(0),
+  grade: text("grade").notNull().default(""),
+  status: text("status").notNull().default("অপ্রযোজ্য"),
+  addedBy: text("added_by"),
+  lastModifiedBy: text("last_modified_by"),
 });
 
-export const routines = pgTable("routines", {
+export const timetable = pgTable("timetable", {
   id: serial("id").primaryKey(),
-  department: text("department").notNull(),
   day: text("day").notNull(),
   time: text("time").notNull(),
   subject: text("subject").notNull(),
-  teacher: text("teacher"),
+  teacherId: text("teacher_id").notNull(),
+  class: text("class").notNull().default(""),
+  addedBy: text("added_by"),
+  lastModifiedBy: text("last_modified_by"),
 });
 
-export const libraryBooks = pgTable("library_books", {
+export const books = pgTable("books", {
   id: serial("id").primaryKey(),
   title: text("title").notNull(),
-  author: text("author"),
-  category: text("category"),
-  isbn: text("isbn"),
-  quantity: integer("quantity").default(1),
-  available: integer("available").default(1),
+  author: text("author").notNull().default(""),
+  isAvailable: boolean("is_available").notNull().default(true),
+  sectionId: text("section_id").notNull().default(""),
+  className: text("class_name").notNull().default(""),
+  addedBy: text("added_by"),
+  lastModifiedBy: text("last_modified_by"),
 });
 
-export const leaveApplications = pgTable("leave_applications", {
+export const librarySections = pgTable("library_sections", {
   id: serial("id").primaryKey(),
-  applicantName: text("applicant_name").notNull(),
-  applicantType: text("applicant_type").notNull(),
-  reason: text("reason").notNull(),
-  fromDate: text("from_date").notNull(),
-  toDate: text("to_date").notNull(),
-  status: text("status").notNull().default("pending"),
+  name: text("name").notNull(),
 });
 
-export const notifications = pgTable("notifications", {
+export const notices = pgTable("notices", {
   id: serial("id").primaryKey(),
-  type: text("type").notNull(),
   title: text("title").notNull(),
-  recipient: text("recipient").notNull(),
-  message: text("message").notNull(),
-  time: text("time"),
-  status: text("status").notNull().default("unread"),
+  content: text("content").notNull(),
+  date: text("date").notNull(),
+  addedBy: text("added_by"),
+  lastModifiedBy: text("last_modified_by"),
+  target: text("target").notNull().default("all_teachers"),
+  teacherIds: jsonb("teacher_ids").$type<string[]>().default([]),
 });
 
 export const events = pgTable("events", {
   id: serial("id").primaryKey(),
-  title: text("title").notNull(),
-  description: text("description"),
+  name: text("name").notNull(),
   date: text("date").notNull(),
-  time: text("time"),
-  type: text("type").notNull().default("general"),
+  description: text("description").notNull().default(""),
+  addedBy: text("added_by"),
+  lastModifiedBy: text("last_modified_by"),
+});
+
+export const notifications = pgTable("notifications", {
+  id: serial("id").primaryKey(),
+  sourceId: text("source_id").notNull().default(""),
+  type: text("type").notNull(),
+  message: text("message").notNull(),
+  date: text("date").notNull(),
+  isRead: boolean("is_read").notNull().default(false),
+  linkTo: text("link_to").notNull().default("ড্যাশবোর্ড"),
 });
 
 export const activityLog = pgTable("activity_log", {
   id: serial("id").primaryKey(),
-  action: text("action").notNull(),
-  details: text("details"),
-  user: text("user").notNull().default("অ্যাডমিন"),
   timestamp: text("timestamp").notNull(),
+  user: text("user").notNull(),
+  action: text("action").notNull(),
+});
+
+export const admitCards = pgTable("admit_cards", {
+  id: serial("id").primaryKey(),
+  studentId: text("student_id").notNull(),
+  examId: text("exam_id").notNull(),
+  issueDate: text("issue_date").notNull(),
+  addedBy: text("added_by"),
+  studentPhotoUrl: text("student_photo_url"),
+});
+
+export const leaves = pgTable("leaves", {
+  id: serial("id").primaryKey(),
+  teacherId: text("teacher_id").notNull(),
+  teacherName: text("teacher_name").notNull().default(""),
+  startDate: text("start_date").notNull(),
+  endDate: text("end_date").notNull(),
+  startTime: text("start_time"),
+  endTime: text("end_time"),
+  reason: text("reason").notNull(),
+  status: text("status").notNull().default("বিচারাধীন"),
+  appliedDate: text("applied_date").notNull(),
+  reviewedBy: text("reviewed_by"),
+  reviewDate: text("review_date"),
+});
+
+export const activeSessions = pgTable("active_sessions", {
+  id: serial("id").primaryKey(),
+  userId: text("user_id").notNull(),
+  userName: text("user_name").notNull(),
+  userRole: text("user_role").notNull(),
+  loginTime: text("login_time").notNull(),
+  lastActive: text("last_active").notNull(),
 });
 
 export const settings = pgTable("settings", {
@@ -176,55 +238,67 @@ export const settings = pgTable("settings", {
 export const insertUserSchema = createInsertSchema(users).omit({ id: true });
 export const insertStudentSchema = createInsertSchema(students).omit({ id: true });
 export const insertTeacherSchema = createInsertSchema(teachers).omit({ id: true });
-export const insertTeacherAttendanceSchema = createInsertSchema(teacherAttendance).omit({ id: true });
+export const insertCourseSchema = createInsertSchema(courses).omit({ id: true });
 export const insertStudentAttendanceSchema = createInsertSchema(studentAttendance).omit({ id: true });
+export const insertTeacherAttendanceSchema = createInsertSchema(teacherAttendance).omit({ id: true });
 export const insertFeeSchema = createInsertSchema(fees).omit({ id: true });
 export const insertExpenseSchema = createInsertSchema(expenses).omit({ id: true });
-export const insertSalarySchema = createInsertSchema(salaries).omit({ id: true });
-export const insertCourseSchema = createInsertSchema(courses).omit({ id: true });
+export const insertTeacherSalarySchema = createInsertSchema(teacherSalaries).omit({ id: true });
 export const insertExamSchema = createInsertSchema(exams).omit({ id: true });
 export const insertResultSchema = createInsertSchema(results).omit({ id: true });
-export const insertRoutineSchema = createInsertSchema(routines).omit({ id: true });
-export const insertLibraryBookSchema = createInsertSchema(libraryBooks).omit({ id: true });
-export const insertLeaveApplicationSchema = createInsertSchema(leaveApplications).omit({ id: true });
-export const insertNotificationSchema = createInsertSchema(notifications).omit({ id: true });
+export const insertTimetableSchema = createInsertSchema(timetable).omit({ id: true });
+export const insertBookSchema = createInsertSchema(books).omit({ id: true });
+export const insertLibrarySectionSchema = createInsertSchema(librarySections).omit({ id: true });
+export const insertNoticeSchema = createInsertSchema(notices).omit({ id: true });
 export const insertEventSchema = createInsertSchema(events).omit({ id: true });
+export const insertNotificationSchema = createInsertSchema(notifications).omit({ id: true });
 export const insertActivityLogSchema = createInsertSchema(activityLog).omit({ id: true });
+export const insertAdmitCardSchema = createInsertSchema(admitCards).omit({ id: true });
+export const insertLeaveSchema = createInsertSchema(leaves).omit({ id: true });
+export const insertActiveSessionSchema = createInsertSchema(activeSessions).omit({ id: true });
 export const insertSettingSchema = createInsertSchema(settings).omit({ id: true });
 
 export type InsertUser = z.infer<typeof insertUserSchema>;
 export type User = typeof users.$inferSelect;
-export type InsertStudent = z.infer<typeof insertStudentSchema>;
 export type Student = typeof students.$inferSelect;
-export type InsertTeacher = z.infer<typeof insertTeacherSchema>;
+export type InsertStudent = z.infer<typeof insertStudentSchema>;
 export type Teacher = typeof teachers.$inferSelect;
-export type InsertTeacherAttendance = z.infer<typeof insertTeacherAttendanceSchema>;
-export type TeacherAttendance = typeof teacherAttendance.$inferSelect;
-export type InsertStudentAttendance = z.infer<typeof insertStudentAttendanceSchema>;
-export type StudentAttendance = typeof studentAttendance.$inferSelect;
-export type InsertFee = z.infer<typeof insertFeeSchema>;
-export type Fee = typeof fees.$inferSelect;
-export type InsertExpense = z.infer<typeof insertExpenseSchema>;
-export type Expense = typeof expenses.$inferSelect;
-export type InsertSalary = z.infer<typeof insertSalarySchema>;
-export type Salary = typeof salaries.$inferSelect;
-export type InsertCourse = z.infer<typeof insertCourseSchema>;
+export type InsertTeacher = z.infer<typeof insertTeacherSchema>;
 export type Course = typeof courses.$inferSelect;
+export type InsertCourse = z.infer<typeof insertCourseSchema>;
+export type StudentAttendance = typeof studentAttendance.$inferSelect;
+export type InsertStudentAttendance = z.infer<typeof insertStudentAttendanceSchema>;
+export type TeacherAttendanceRecord = typeof teacherAttendance.$inferSelect;
+export type InsertTeacherAttendance = z.infer<typeof insertTeacherAttendanceSchema>;
+export type Fee = typeof fees.$inferSelect;
+export type InsertFee = z.infer<typeof insertFeeSchema>;
+export type Expense = typeof expenses.$inferSelect;
+export type InsertExpense = z.infer<typeof insertExpenseSchema>;
+export type TeacherSalary = typeof teacherSalaries.$inferSelect;
+export type InsertTeacherSalary = z.infer<typeof insertTeacherSalarySchema>;
+export type ExamRecord = typeof exams.$inferSelect;
 export type InsertExam = z.infer<typeof insertExamSchema>;
-export type Exam = typeof exams.$inferSelect;
+export type ResultRecord = typeof results.$inferSelect;
 export type InsertResult = z.infer<typeof insertResultSchema>;
-export type Result = typeof results.$inferSelect;
-export type InsertRoutine = z.infer<typeof insertRoutineSchema>;
-export type Routine = typeof routines.$inferSelect;
-export type InsertLibraryBook = z.infer<typeof insertLibraryBookSchema>;
-export type LibraryBook = typeof libraryBooks.$inferSelect;
-export type InsertLeaveApplication = z.infer<typeof insertLeaveApplicationSchema>;
-export type LeaveApplication = typeof leaveApplications.$inferSelect;
-export type InsertNotification = z.infer<typeof insertNotificationSchema>;
-export type Notification = typeof notifications.$inferSelect;
+export type TimetableEntry = typeof timetable.$inferSelect;
+export type InsertTimetable = z.infer<typeof insertTimetableSchema>;
+export type Book = typeof books.$inferSelect;
+export type InsertBook = z.infer<typeof insertBookSchema>;
+export type LibrarySection = typeof librarySections.$inferSelect;
+export type InsertLibrarySection = z.infer<typeof insertLibrarySectionSchema>;
+export type Notice = typeof notices.$inferSelect;
+export type InsertNotice = z.infer<typeof insertNoticeSchema>;
+export type EventRecord = typeof events.$inferSelect;
 export type InsertEvent = z.infer<typeof insertEventSchema>;
-export type Event = typeof events.$inferSelect;
+export type NotificationRecord = typeof notifications.$inferSelect;
+export type InsertNotification = z.infer<typeof insertNotificationSchema>;
+export type ActivityLogEntry = typeof activityLog.$inferSelect;
 export type InsertActivityLog = z.infer<typeof insertActivityLogSchema>;
-export type ActivityLog = typeof activityLog.$inferSelect;
-export type InsertSetting = z.infer<typeof insertSettingSchema>;
+export type AdmitCard = typeof admitCards.$inferSelect;
+export type InsertAdmitCard = z.infer<typeof insertAdmitCardSchema>;
+export type LeaveRecord = typeof leaves.$inferSelect;
+export type InsertLeave = z.infer<typeof insertLeaveSchema>;
+export type ActiveSession = typeof activeSessions.$inferSelect;
+export type InsertActiveSession = z.infer<typeof insertActiveSessionSchema>;
 export type Setting = typeof settings.$inferSelect;
+export type InsertSetting = z.infer<typeof insertSettingSchema>;
