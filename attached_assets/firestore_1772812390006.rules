@@ -1,0 +1,84 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // --- Helper Functions ---
+    // These functions use get() or exists() and are NOT safe for `list` queries.
+    // They should only be used for rules on single documents (get, create, update, delete).
+    function isAdmin() {
+      return request.auth != null && request.auth.token.email == get(/databases/$(database)/documents/settings/config).data.isAdmin.adminUser;
+    }
+
+    function isTeacher() {
+      return request.auth != null && exists(/databases/$(database)/documents/teachers/$(request.auth.uid));
+    }
+
+    function isSuperAdmin() {
+        if (request.auth == null) { return false; }
+        let teacherDoc = get(/databases/$(database)/documents/teachers/$(request.auth.uid));
+        return 'data' in teacherDoc && 'isSuperAdmin' in teacherDoc.data && teacherDoc.data.isSuperAdmin == true;
+    }
+
+    // A user is "authorized" for single-document GET/WRITE operations.
+    function isAuthorizedUserForSingleDoc() {
+      return request.auth != null && (isAdmin() || isSuperAdmin() || isTeacher());
+    }
+    
+    // --- Rule Definitions ---
+
+    // SETTINGS: Allow any logged-in user to read single docs (needed for isAdmin check), but only admin can write.
+    match /settings/{docId} {
+      allow get: if request.auth != null;
+      allow list: if false; // Do not allow listing all settings docs.
+      allow write: if isAdmin();
+    }
+    
+    // TEACHERS: Allow listing for login fallback. Secure single-doc operations.
+    match /teachers/{teacherId} {
+      allow list: if request.auth != null;
+      allow get: if isAdmin() || (isTeacher() && request.auth.uid == teacherId);
+      allow update: if isAdmin() || isSuperAdmin() || (isTeacher() && request.auth.uid == teacherId);
+      allow create, delete: if isAdmin();
+    }
+    
+    // LEAVES: Separate list (for all) and get (for owner/admin).
+    match /leaves/{leaveId} {
+      allow list: if request.auth != null;
+      allow get: if isAdmin() || isSuperAdmin() || (isTeacher() && resource.data.teacherId == request.auth.uid);
+      allow create: if isTeacher();
+      allow update: if isAdmin() || isSuperAdmin(); // Only admin/super-admin can approve/reject.
+      allow delete: if isAdmin(); // Let admin delete if necessary.
+    }
+    
+    // ADMIN-ONLY COLLECTIONS:
+    match /activityLog/{logId} {
+      allow list: if request.auth != null;
+      allow get: if isAdmin() || isSuperAdmin();
+      allow create: if request.auth != null;
+      allow update, delete: if false;
+    }
+    match /activeSessions/{sessionId} {
+      allow list: if request.auth != null;
+      allow get, delete: if isAdmin() || isSuperAdmin();
+      allow create: if request.auth != null;
+      allow update: if false;
+    }
+
+    // COUNTERS: Used in transactions, secure it for authorized users.
+    match /counters/{counterId} {
+      allow list: if false;
+      allow get, write: if isAuthorizedUserForSingleDoc();
+    }
+
+    // DEFAULT RULE FOR ALL OTHER COLLECTIONS (students, fees, results, etc.)
+    match /{collection}/{docId} {
+      // Allow any logged-in user to LIST documents. This is safe because
+      // the actual data is protected by the 'get' rule. This fixes the
+      // error when calling getDocs() or using onSnapshot() on a collection.
+      allow list: if request.auth != null;
+      
+      // Allow only authorized users to GET a single document or WRITE to it.
+      allow get, write: if isAuthorizedUserForSingleDoc();
+    }
+  }
+}

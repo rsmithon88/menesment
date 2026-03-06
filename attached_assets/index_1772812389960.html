@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="bn">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="/vite.svg" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>মাদ্রাসা ম্যানেজমেন্ট ড্যাশবোর্ড</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preload" as="font" type="font/woff2" href="https://banglawebfonts.pages.dev/fonts/kalpurush/kalpurush-regular.woff2" crossorigin="anonymous">
+    <style>
+      @import url('https://banglawebfonts.pages.dev/css/kalpurush.css');
+      body, button, input, select, textarea {
+        font-family: 'Kalpurush', serif !important;
+      }
+    </style>
+    <script>
+      tailwind.config = {
+        theme: {
+          extend: {
+            colors: {
+              'primary': '#0D47A1', // Deep Blue
+              'secondary': '#1565C0',
+              'accent': '#FFC107', // Amber/Gold
+              'background': '#F5F7FA',
+              'text-primary': '#1F2937',
+              'text-secondary': '#4B5563',
+            },
+            fontFamily: {
+              sans: ['Kalpurush', 'serif'],
+            },
+          }
+        }
+      }
+    </script>
+  <script type="importmap">
+{
+  "imports": {
+    "react": "https://aistudiocdn.com/react@^19.2.0",
+    "react/": "https://aistudiocdn.com/react@^19.2.0/",
+    "react-dom/": "https://aistudiocdn.com/react-dom@^19.2.0/",
+    "@google/genai": "https://aistudiocdn.com/@google/genai/dist/index.js",
+    "firebase/": "https://aistudiocdn.com/firebase@^12.5.0/"
+  }
+}
+</script>
+<link rel="stylesheet" href="/index.css">
+</head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/index.tsx"></script>
+  </body>
+</html>

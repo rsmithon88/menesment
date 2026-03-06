@@ -1,0 +1,7 @@
+{
+  "name": "Madrasah Management Dashboard",
+  "description": "A comprehensive dashboard for managing students, teachers, and courses in a Madrasah, featuring an AI assistant powered by Gemini for administrative tasks.",
+  "requestFramePermissions": [
+    "geolocation"
+  ]
+}
