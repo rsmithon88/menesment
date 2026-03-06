@@ -17,37 +17,56 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { MoreHorizontal, Plus, Search, Filter, Trash2, Edit } from "lucide-react";
+import { MoreHorizontal, Plus, Search, Trash2, Edit } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { toast } from "@/hooks/use-toast";
-
-const students = [
-  { id: "ST-001", name: "আব্দুর রহমান", class: "হেফজ বিভাগ", roll: "০১", status: "Active", fees: "Paid" },
-  { id: "ST-002", name: "মোহাম্মদ ইউসুফ", class: "কিতাব বিভাগ", roll: "১২", status: "Active", fees: "Due" },
-  { id: "ST-003", name: "ইব্রাহিম খলিল", class: "নাজেরা বিভাগ", roll: "০৫", status: "Inactive", fees: "Paid" },
-  { id: "ST-004", name: "হাসান মাহমুদ", class: "হেফজ বিভাগ", roll: "০৩", status: "Active", fees: "Paid" },
-  { id: "ST-005", name: "ওমর ফারুক", class: "কিতাব বিভাগ", roll: "০৮", status: "Active", fees: "Due" },
-];
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { apiRequest } from "@/lib/queryClient";
+import type { Student } from "@shared/schema";
+import { Skeleton } from "@/components/ui/skeleton";
 
 export default function Students() {
-  const handleDelete = (id: string) => {
-    toast({
-      title: "ছাত্র মুছে ফেলা হয়েছে",
-      description: `আইডি: ${id} সফলভাবে ডিলিট করা হয়েছে।`,
-      variant: "destructive"
-    });
-  };
+  const queryClient = useQueryClient();
+
+  const { data: students = [], isLoading } = useQuery<Student[]>({
+    queryKey: ["/api/students"],
+  });
+
+  const deleteMutation = useMutation({
+    mutationFn: async (id: number) => {
+      await apiRequest("DELETE", `/api/students/${id}`);
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/students"] });
+      toast({
+        title: "ছাত্র মুছে ফেলা হয়েছে",
+        description: "সফলভাবে ডিলিট করা হয়েছে।",
+        variant: "destructive",
+      });
+    },
+  });
+
+  if (isLoading) {
+    return (
+      <Layout>
+        <div className="space-y-6" data-testid="students-loading">
+          <Skeleton className="h-10 w-64" />
+          <Skeleton className="h-[400px] w-full" />
+        </div>
+      </Layout>
+    );
+  }
 
   return (
     <Layout>
-      <div className="space-y-6">
+      <div className="space-y-6" data-testid="students-page">
         <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
           <div>
-            <h1 className="text-3xl font-bold tracking-tight">ছাত্র/ছাত্রী ব্যবস্থাপনা</h1>
+            <h1 className="text-3xl font-bold tracking-tight" data-testid="text-students-title">ছাত্র/ছাত্রী ব্যবস্থাপনা</h1>
             <p className="text-muted-foreground mt-2">সকল ছাত্র/ছাত্রীদের তথ্য, এডিট এবং ডিলিট অপশন।</p>
           </div>
-          <Button className="gap-2">
+          <Button className="gap-2" data-testid="button-add-student">
             <Plus className="h-4 w-4" />
             নতুন ছাত্র যোগ করুন
           </Button>
@@ -59,11 +78,12 @@ export default function Students() {
             <Input
               placeholder="নাম বা আইডি দিয়ে খুঁজুন..."
               className="pl-9"
+              data-testid="input-search-student"
             />
           </div>
           <div className="flex items-center gap-2 w-full sm:w-auto">
              <Select defaultValue="all">
-                <SelectTrigger className="w-[180px]">
+                <SelectTrigger className="w-[180px]" data-testid="select-department-filter">
                   <SelectValue placeholder="বিভাগ নির্বাচন করুন" />
                 </SelectTrigger>
                 <SelectContent>
@@ -91,25 +111,25 @@ export default function Students() {
             </TableHeader>
             <TableBody>
               {students.map((student) => (
-                <TableRow key={student.id}>
-                  <TableCell className="font-medium">{student.id}</TableCell>
-                  <TableCell>{student.name}</TableCell>
-                  <TableCell>{student.class}</TableCell>
+                <TableRow key={student.id} data-testid={`row-student-${student.id}`}>
+                  <TableCell className="font-medium" data-testid={`text-studentid-${student.id}`}>{student.studentId}</TableCell>
+                  <TableCell data-testid={`text-studentname-${student.id}`}>{student.nameBn}</TableCell>
+                  <TableCell>{student.department}</TableCell>
                   <TableCell>{student.roll}</TableCell>
                   <TableCell>
-                    <Badge variant={student.status === "Active" ? "default" : "secondary"} className={student.status === "Active" ? "bg-emerald-100 text-emerald-700 hover:bg-emerald-200" : "bg-gray-100 text-gray-700 hover:bg-gray-200"}>
-                      {student.status === "Active" ? "সক্রিয়" : "নিষ্ক্রিয়"}
+                    <Badge variant={student.status === "active" ? "default" : "secondary"} className={student.status === "active" ? "bg-emerald-100 text-emerald-700 hover:bg-emerald-200" : "bg-gray-100 text-gray-700 hover:bg-gray-200"} data-testid={`badge-status-${student.id}`}>
+                      {student.status === "active" ? "সক্রিয়" : "নিষ্ক্রিয়"}
                     </Badge>
                   </TableCell>
                   <TableCell>
-                    <Badge variant="outline" className={student.fees === "Paid" ? "border-emerald-200 text-emerald-700" : "border-red-200 text-red-700"}>
-                      {student.fees === "Paid" ? "পরিশোধিত" : "বকেয়া"}
+                    <Badge variant="outline" className={student.feeStatus === "paid" ? "border-emerald-200 text-emerald-700" : "border-red-200 text-red-700"} data-testid={`badge-fee-${student.id}`}>
+                      {student.feeStatus === "paid" ? "পরিশোধিত" : "বকেয়া"}
                     </Badge>
                   </TableCell>
                   <TableCell className="text-right">
                     <DropdownMenu>
                       <DropdownMenuTrigger asChild>
-                        <Button variant="ghost" className="h-8 w-8 p-0">
+                        <Button variant="ghost" className="h-8 w-8 p-0" data-testid={`button-actions-${student.id}`}>
                           <span className="sr-only">Open menu</span>
                           <MoreHorizontal className="h-4 w-4" />
                         </Button>
@@ -120,7 +140,7 @@ export default function Students() {
                             <Edit className="mr-2 h-4 w-4" /> সম্পাদনা করুন
                         </DropdownMenuItem>
                         <DropdownMenuSeparator />
-                        <DropdownMenuItem className="text-red-600" onClick={() => handleDelete(student.id)}>
+                        <DropdownMenuItem className="text-red-600" onClick={() => deleteMutation.mutate(student.id)} data-testid={`button-delete-${student.id}`}>
                             <Trash2 className="mr-2 h-4 w-4" /> ডিলিট করুন
                         </DropdownMenuItem>
                       </DropdownMenuContent>
