@@ -2,10 +2,30 @@ import type { Express } from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./storage";
 
+async function ensureDefaultAdmin() {
+  try {
+    const existing = await storage.getUserByUsername('admin@madrasa.com');
+    if (!existing) {
+      await storage.createUser({
+        username: 'admin@madrasa.com',
+        password: 'admin123',
+        name: 'অ্যাডমিন',
+        email: 'admin@madrasa.com',
+        role: 'admin',
+      });
+      console.log('Default admin user created.');
+    }
+  } catch (error) {
+    console.error('Error ensuring default admin:', error);
+  }
+}
+
 export async function registerRoutes(
   httpServer: Server,
   app: Express
 ): Promise<Server> {
+
+  await ensureDefaultAdmin();
 
   app.post("/api/auth/login", async (req, res) => {
     try {
