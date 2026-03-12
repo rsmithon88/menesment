@@ -26,6 +26,7 @@ import LeaveManagement from './components/LeaveManagement';
 import TeacherAttendanceComponent from './components/TeacherAttendance';
 import AdminRoles from './components/AdminRoles';
 import MoneyReceipt from './components/MoneyReceipt';
+import ResultSheet from './components/ResultSheet';
 import { getDistance } from './components/utils';
 
 import {
@@ -45,7 +46,7 @@ import {
   MegaphoneIcon, ChartBarIcon, CalendarIcon, CogIcon,
   IdentificationIcon, ShieldCheckIcon, DocumentTextIcon,
   ReceiptRefundIcon, CreditCardIcon, TicketIcon, LeaveIcon,
-  XIcon, ClipboardCheckIcon, KeyIcon, MapPinIcon
+  XIcon, ClipboardCheckIcon, KeyIcon, MapPinIcon, TableIcon
 } from './constants';
 
 interface ToastNotificationProps {
@@ -613,6 +614,7 @@ const App: React.FC = () => {
     { name: 'শিক্ষকদের বেতন' as Page, icon: CreditCardIcon },
     { name: 'পরীক্ষা' as Page, icon: PencilAltIcon },
     { name: 'রেজাল্ট' as Page, icon: DocumentTextIcon },
+    { name: 'তাল শীট' as Page, icon: TableIcon },
     { name: 'প্রবেশপত্র' as Page, icon: TicketIcon },
     { name: 'ছুটির আবেদন' as Page, icon: LeaveIcon },
     { name: 'সময়সূচী' as Page, icon: ClockIcon },
@@ -643,6 +645,7 @@ const App: React.FC = () => {
       case 'শিক্ষকদের বেতন': return <TeacherSalary salaries={teacherSalaries} teachers={teachers} addSalary={handleAddSalary} updateSalary={handleUpdateSalary} deleteSalary={handleDeleteSalary} hasPermission={hasPermission} />;
       case 'পরীক্ষা': return <Exams exams={exams} courses={courses} addExam={handleAddExam} updateExam={handleUpdateExam} deleteExam={handleDeleteExam} hasPermission={hasPermission} classOptions={classOptions} />;
       case 'রেজাল্ট': return <Results results={resultsData} students={students} exams={exams} courses={courses} addResult={handleAddResult} updateResult={handleUpdateResult} deleteResult={handleDeleteResult} hasPermission={hasPermission} classOptions={classOptions} />;
+      case 'তাল শীট': return <ResultSheet students={students} courses={courses} hasPermission={hasPermission} classOptions={classOptions} madrasahName={madrasahName} />;
       case 'প্রবেশপত্র': return <AdmitCards students={students} exams={exams} admitCards={admitCards} courses={courses} addAdmitCard={handleAddAdmitCard} updateAdmitCard={handleUpdateAdmitCard} deleteAdmitCard={handleDeleteAdmitCard} madrasahName={madrasahName} madrasahAddress={madrasahAddress} hasPermission={hasPermission} classOptions={classOptions} signatureSettings={signatureSettings} />;
       case 'ছুটির আবেদন': return <LeaveManagement currentUser={currentUser!} teachers={teachers} leaves={leavesData} addLeave={handleAddLeave} updateLeave={handleUpdateLeave} deleteLeave={handleDeleteLeave} />;
       case 'সময়সূচী': return <Timetable timetable={timetableData} teachers={teachers} addTimetableEntry={handleAddTimetableEntry} updateTimetableEntry={handleUpdateTimetableEntry} deleteTimetableEntry={handleDeleteTimetableEntry} hasPermission={hasPermission} classOptions={classOptions} />;

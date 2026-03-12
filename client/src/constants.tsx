@@ -239,4 +239,10 @@ export const MailIcon = (props: React.SVGProps<SVGSVGElement>) => (
   </svg>
 );
 
+export const TableIcon = (props: React.SVGProps<SVGSVGElement>) => (
+  <svg {...props} xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 10h18M3 14h18M10 3v18M14 3v18M3 6a3 3 0 013-3h12a3 3 0 013 3v12a3 3 0 01-3 3H6a3 3 0 01-3-3V6z" />
+  </svg>
+);
+
 export const EXAM_NAME_OPTIONS = ['১ম সাময়িক', '২য় সাময়িক', 'বার্ষিক পরীক্ষা', 'মাসিক পরীক্ষা'];

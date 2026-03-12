@@ -242,6 +242,7 @@ export type Page =
   | 'সেটিংস'
   | 'অ্যাডমিন রোল'
   | 'ছুটির আবেদন'
+  | 'তাল শীট'
   | 'মেসেজ';
 
 export type LoggedInUser = {
