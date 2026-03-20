@@ -1,0 +1,38 @@
+
+> rest-express@1.0.0 dev
+> NODE_ENV=development tsx server/index.ts
+
+[1G[0K8:42:13 AM [express] serving on port 5000
+[baseline-browser-mapping] The data in this module is over two months old.  To ensure accurate Baseline data, please update: `npm i baseline-browser-mapping@latest -D`
+8:43:18 AM [express] POST /api/auth/login 401 in 21ms :: {"message":"ভুল ইমেইল অথবা পাসওয়ার্ড।"}
+8:43:53 AM [express] POST /api/auth/login 401 in 12ms :: {"message":"ভুল ইমেইল অথবা পাসওয়ার্ড।"}
+8:43:57 AM [express] POST /api/auth/login 401 in 3ms :: {"message":"ভুল ইমেইল অথবা পাসওয়ার্ড।"}
+8:44:04 AM [express] POST /api/auth/login 401 in 3ms :: {"message":"ভুল ইমেইল অথবা পাসওয়ার্ড।"}
+8:44:10 AM [express] POST /api/auth/login 401 in 2ms :: {"message":"ভুল ইমেইল অথবা পাসওয়ার্ড।"}
+8:45:23 AM [express] POST /api/auth/login 200 in 10ms :: {"id":"1","name":"অ্যাডমিন","email":"admin@madrasa.com","role":"admin","photoURL":null}
+8:45:24 AM [express] POST /api/activeSessions/upsert 200 in 38ms :: {"id":"1","userId":"1","userName":"অ্যাডমিন","userRole":"admin","loginTime":"2026-03-12T08:45:23.614Z","lastActive":"2026-03-12T08:45:23.623Z"}
+8:45:24 AM [express] GET /api/students 200 in 3ms :: []
+8:45:24 AM [express] GET /api/attendance 200 in 2ms :: []
+8:45:24 AM [express] GET /api/teachers 200 in 4ms :: []
+8:45:24 AM [express] GET /api/fees 200 in 4ms :: []
+8:45:24 AM [express] GET /api/teacherAttendance 200 in 11ms :: []
+8:45:24 AM [express] GET /api/courses 200 in 15ms :: []
+8:45:24 AM [express] GET /api/expenses 200 in 2ms :: []
+8:45:24 AM [express] GET /api/teacherSalaries 200 in 2ms :: []
+8:45:24 AM [express] GET /api/exams 200 in 2ms :: []
+8:45:24 AM [express] GET /api/results 200 in 2ms :: []
+8:45:24 AM [express] GET /api/books 200 in 2ms :: []
+8:45:24 AM [express] GET /api/timetable 200 in 3ms :: []
+8:45:25 AM [express] GET /api/librarySections 200 in 2ms :: []
+8:45:25 AM [express] GET /api/notices 200 in 2ms :: []
+8:45:25 AM [express] GET /api/leaves 200 in 1ms :: []
+8:45:25 AM [express] GET /api/events 200 in 2ms :: []
+8:45:25 AM [express] GET /api/notifications 200 in 2ms :: []
+8:45:25 AM [express] GET /api/admitCards 200 in 2ms :: []
+8:45:25 AM [express] GET /api/activityLog 200 in 7ms :: []
+8:45:25 AM [express] GET /api/activeSessions 200 in 1ms :: [{"id":"1","userId":"1","userName":"অ্যাডমিন","userRole":"admin","loginTime":"2026-03-12T08:45:23.614Z","lastActive":"2026-03-12T08:45:23.623Z"}]
+8:45:25 AM [express] GET /api/settings/smsConfig 200 in 4ms
+8:45:25 AM [express] GET /api/settings/config 200 in 5ms :: {"madrasahName":"দারুস সালাম মাদরাসা","madrasahAddress":"মাদ্রাসার ঠিকানা"}
+8:45:25 AM [express] GET /api/settings/geofenceConfig 200 in 1ms
+8:45:25 AM [express] GET /api/settings/receiptBookConfig 200 in 1ms
+8:45:25 AM [express] GET /api/settings/signatureConfig 200 in 1ms
